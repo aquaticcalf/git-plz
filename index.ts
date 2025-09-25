@@ -23,32 +23,32 @@ function runGit(args: string[]): {
 	return { stdout, stderr, success: result.success }
 }
 
-const repoCheck = runGit(["rev-parse", "--is-inside-work-tree"])
-if (!repoCheck.success) {
+const repo_check = runGit(["rev-parse", "--is-inside-work-tree"])
+if (!repo_check.success) {
 	console.error(chalk.red("Error: Not inside a Git repository."))
 	process.exit(1)
 }
 
-const statusResult = runGit(["status", "--porcelain"])
-if (statusResult.stdout === "") {
+const status_result = runGit(["status", "--porcelain"])
+if (status_result.stdout === "") {
 	console.log(chalk.yellow("No changes to commit."))
 	process.exit(0)
 }
 
-const diffResult = runGit(["diff"])
-const logResultObj = runGit(["log", "--oneline", "-5"])
-const logResult = logResultObj.stdout || "No recent commits."
+const diff_result = runGit(["diff"])
+const log_result_obj = runGit(["log", "--oneline", "-5"])
+const log_result = log_result_obj.stdout || "No recent commits."
 
 const prompt = `Generate a concise, imperative commit message (one line, starting with a verb like "add", "fix", "update") based on the following:
 
 Unstaged changes status:
-${statusResult.stdout}
+${status_result.stdout}
 
 Diff of changes:
-${diffResult.stdout}
+${diff_result.stdout}
 
 Recent commit history:
-${logResult}
+${log_result}
 
 Focus on the "why" and purpose of the changes, not just "what". Keep it under 72 characters.`
 
@@ -62,17 +62,17 @@ try {
 
 	console.log(chalk.green(`Generated commit message: ${message}`))
 
-	const addResult = runGit(["add", "."])
-	if (!addResult.success) {
+	const add_result = runGit(["add", "."])
+	if (!add_result.success) {
 		console.error(chalk.red("Error: Failed to stage changes."))
 		process.exit(1)
 	}
 
-	const commitResult = runGit(["commit", "-m", message])
-	if (commitResult.success) {
+	const commit_result = runGit(["commit", "-m", message])
+	if (commit_result.success) {
 		console.log(chalk.green("Commit successful!"))
 	} else {
-		console.error(chalk.red(`Error: Commit failed. ${commitResult.stderr}`))
+		console.error(chalk.red(`Error: Commit failed. ${commit_result.stderr}`))
 		process.exit(1)
 	}
 } catch (error) {
