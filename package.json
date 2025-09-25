@@ -1,0 +1,21 @@
+{
+	"name": "git-plz",
+	"module": "index.ts",
+	"type": "module",
+	"private": true,
+	"bin": {
+		"git-plz": "index.ts"
+	},
+	"devDependencies": {
+		"@types/bun": "latest"
+	},
+	"peerDependencies": {
+		"typescript": "^5"
+	},
+	"dependencies": {
+		"@ai-sdk/openai": "^2.0.35",
+		"@biomejs/biome": "^2.2.4",
+		"ai": "^5.0.52",
+		"chalk": "^5.6.2"
+	}
+}
