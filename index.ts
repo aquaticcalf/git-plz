@@ -39,7 +39,7 @@ const diffResult = runGit(["diff"])
 const logResultObj = runGit(["log", "--oneline", "-5"])
 const logResult = logResultObj.stdout || "No recent commits."
 
-const prompt = `Generate a concise, imperative commit message (one line, starting with a verb like "Add", "Fix", "Update") based on the following:
+const prompt = `Generate a concise, imperative commit message (one line, starting with a verb like "add", "fix", "update") based on the following:
 
 Unstaged changes status:
 ${statusResult.stdout}
