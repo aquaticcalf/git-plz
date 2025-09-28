@@ -6,6 +6,9 @@
 	"bin": {
 		"git-plz": "index.ts"
 	},
+	"scripts": {
+		"fix": "biome check --write . --verbose"
+	},
 	"devDependencies": {
 		"@types/bun": "latest"
 	},
