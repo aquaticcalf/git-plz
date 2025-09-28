@@ -3,6 +3,7 @@ import { createInterface } from "node:readline/promises"
 import { generateText } from "ai"
 import { spawnSync } from "bun"
 import chalk from "chalk"
+import inquirer from "inquirer"
 
 const keyPath = `${process.env.HOME}/.local/share/git-plz/key.txt`
 
@@ -66,44 +67,26 @@ const untracked = untracked_result.stdout
 const allFiles = [...new Set([...modified, ...untracked])].sort()
 
 if (allFiles.length > 0) {
-	console.log(chalk.blue("\nFiles to stage:"))
-	allFiles.forEach((file, index) => {
-		console.log(`${index + 1}. ${file}`)
-	})
-	const rl = createInterface({
-		input: process.stdin,
-		output: process.stdout,
-	})
-	const input = await rl.question(
-		chalk.yellow(
-			"\nAll files selected by default. Enter numbers of files to exclude (e.g., 1 or 1,3 or 1-3), or press Enter to stage all: ",
-		),
-	)
-	rl.close()
-	const excluded = new Set()
-	if (input.trim() !== "") {
-		const parts = input.split(",").map(p => p.trim())
-		for (const part of parts) {
-			if (part.includes("-")) {
-				const splitParts = part.split("-")
-				const startStr = splitParts[0] ?? ""
-				const endStr = splitParts[1] ?? ""
-				const start = parseInt(startStr, 10)
-				const end = parseInt(endStr, 10)
-				for (let i = start; i <= end; i++) {
-					if (!Number.isNaN(i)) excluded.add(i - 1)
-				}
-			} else {
-				const num = parseInt(part, 10)
-				if (!Number.isNaN(num)) excluded.add(num - 1)
-			}
-		}
-	}
-	const selected = allFiles.filter((_, index) => !excluded.has(index))
+	const question = {
+		name: "files",
+		type: "checkbox" as const,
+		message: "Select files to stage: (Press <space> to select)",
+		choices: allFiles.map(file => ({ name: file, value: file })),
+	} as const
+
+	const answers = await inquirer.prompt(question)
+
+	const selected = (answers as { files: string[] }).files || []
+
 	if (selected.length === 0) {
 		console.log(chalk.yellow("No files selected to stage. Aborting."))
 		process.exit(0)
 	}
+
+	console.log(chalk.green("\nYour selected files:"))
+	selected.forEach((file: string) => {
+		console.log(`- ${chalk.cyan(file)}`)
+	})
 
 	const selectedStatus = runGit(["status", "--porcelain", ...selected])
 	const selectedDiff = runGit(["diff", ...selected])
