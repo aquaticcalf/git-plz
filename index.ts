@@ -1,13 +1,32 @@
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs"
+import { createInterface } from "node:readline/promises"
 import { generateText } from "ai"
-import chalk from "chalk"
 import { spawnSync } from "bun"
+import chalk from "chalk"
 
-if (!process.env.AI_GATEWAY_API_KEY) {
-	console.error(
-		chalk.red("Error: AI_GATEWAY_API_KEY environment variable is required."),
+const keyPath = `${process.env.HOME}/.local/share/git-plz/key.txt`
+
+let apiKey: string
+try {
+	apiKey = readFileSync(keyPath, "utf8").trim()
+} catch (_error) {
+	console.log(
+		chalk.yellow(
+			"API key not found. Please enter it (it will be saved for future use):",
+		),
 	)
-	process.exit(1)
+	const rl = createInterface({
+		input: process.stdin,
+		output: process.stdout,
+	})
+	apiKey = await rl.question("Enter your AI Gateway API key: ")
+	rl.close()
+	const dir = keyPath.substring(0, keyPath.lastIndexOf("/"))
+	mkdirSync(dir, { recursive: true })
+	writeFileSync(keyPath, apiKey)
+	console.log(chalk.green("API key saved!"))
 }
+process.env.AI_GATEWAY_API_KEY = apiKey
 
 function runGit(args: string[]): {
 	stdout: string
