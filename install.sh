@@ -15,4 +15,4 @@ fi
 git config --global alias.plz "!$BUN_PATH \"$PROJECT_DIR/index.ts\""
 
 echo "Installed! Now run 'git plz' to use it."
-echo "To uninstall: git config --global --unset alias.plz"
+
